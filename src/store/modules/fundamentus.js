@@ -26,30 +26,33 @@ export default {
         'Liq. Corr.': '', 'ROIC': '', 'ROE': '', 'Liq. 2meses': '', 'Patrim. Liq': '', 'Div. Brut/Patrim': '', 'Cresc. Rec. 5a': ''
       }
 
-      await axios.get('http://localhost:8080/resultado.php', { header: header }).then(response => (res = response))
+      await axios.get('http://localhost:8080/resultado.php', { header: header, params:'s=chrome://new-tab-page/&i=d&m=n' }).then(response => (res = response))
 
       res = res.data.match(/<([td])\s?[a-z="\s?]*>(\n?.*\n?)<\/td>/g)
-      let count=0 
+      let count=0
       res.forEach((element, index) => {
         if (index % 21 == 0) {
+          obj = {}
           element = element.replace(/<\/a><\/span><\/td>/g, '')
           element = element.replace(/<([td])\s?[a-z="\s?]*>(\n?.*\n?)>/g, '')
-          Object.assign(obj, indice)
+          
           obj[`${Object.entries(indice)[0][0]}`] = element
           count++
 
         } else {
-          element = element.replace(/<\/?td?>/g, '')
+
+         element = element.replace(/<\/?td?>/g, '')
+        element = element.replace(',', '.')
+          element = element.replace('%', '')
           obj[`${Object.entries(indice)[count][0]}`] = element
-          array.push(obj)
           count++
-          console.log(element)
         }
         if(count==21){
           count =0
+          array.push(obj)
+          obj = {}
         }
       });
-
       commit('start', array)
     }
   },
